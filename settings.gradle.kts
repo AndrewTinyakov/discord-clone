@@ -1,2 +1,6 @@
 rootProject.name = "discord-clone"
-include("core")
+include(
+    "core",
+    "services",
+    "common"
+)
