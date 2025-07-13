@@ -5,11 +5,12 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.discord.authserver.dto.LoginDTO
 import com.discord.authserver.dto.RegisterDTO
 import com.discord.authserver.entity.User
+import com.discord.authserver.exception.UsernameAlreadyExistsException
 import com.discord.authserver.repository.UserRepository
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Mono
 import java.security.PrivateKey
 import java.security.PublicKey
 import java.security.interfaces.RSAPrivateKey
@@ -23,48 +24,44 @@ class AuthService(
     private val privateKey: PrivateKey,
     private val publicKey: PublicKey
 ) {
-    fun register(request: RegisterDTO): Mono<Void> =
-        userRepository.findByUsername(request.username)
-            .flatMap<User> {
-                Mono.error(UsernameNotFoundException("User='${request.username}' not found"))
-            }
-            .switchIfEmpty(
-                Mono.defer {
-                    val hash = passwordEncoder.encode(request.password)
-                    val user = User(
-                        username = request.username,
-                        hashedPassword = hash,
-                        roles = setOf("USER")
-                    )
+    fun register(request: RegisterDTO) {
+        val existing = userRepository.findByUsername(request.username)
 
-                    userRepository.save(user)
-                }
+        if (existing != null) {
+            throw UsernameAlreadyExistsException("User='${request.username}' already exists")
+        }
+
+        val hash = passwordEncoder.encode(request.password)
+        val user = User(
+            username = request.username,
+            hashedPassword = hash,
+            roles = setOf("USER")
+        )
+
+        userRepository.save(user)
+    }
+
+    fun login(request: LoginDTO): String {
+        val user = userRepository.findByUsername(request.username)
+            ?: throw UsernameNotFoundException("User='${request.username}' not found")
+
+        if (!passwordEncoder.matches(request.password, user.hashedPassword)) {
+            throw BadCredentialsException("Bad credentials")
+        }
+
+        val token = JWT.create()
+            .withSubject(request.username)
+            .withArrayClaim("roles", user.roles.toTypedArray())
+            .withExpiresAt(Date(System.currentTimeMillis() + EXPIRED_DATE))
+            .sign(
+                Algorithm.RSA256(
+                    publicKey as RSAPublicKey,
+                    privateKey as RSAPrivateKey
+                )
             )
-            .then()
 
-    fun login(request: LoginDTO): Mono<Pair<String, User>> =
-        userRepository.findByUsername(request.username)
-            .switchIfEmpty (
-                Mono.error(IllegalArgumentException("User='${request.username}' exist"))
-            )
-            .flatMap { user ->
-                if (!passwordEncoder.matches(request.password, user.hashedPassword)) {
-                    Mono.error(IllegalArgumentException("Bad credentials"))
-                } else {
-                    val token = JWT.create()
-                        .withSubject(user.id.toString())
-                        .withArrayClaim("roles", user.roles.toTypedArray())
-                        .withExpiresAt(Date(System.currentTimeMillis() + EXPIRED_DATE))
-                        .sign(
-                            Algorithm.RSA256(
-                                publicKey as RSAPublicKey,
-                                privateKey as RSAPrivateKey
-                            )
-                        )
-
-                    Mono.just(token to user)
-                }
-            }
+        return token
+    }
 
     private companion object {
         const val EXPIRED_DATE = 3_600_000

@@ -21,6 +21,7 @@ repositories {
 extra["springCloudVersion"] = "2024.0.1"
 
 dependencies {
+    implementation("org.cognitor.cassandra:cassandra-migration-spring-boot-starter:2.6.1_v4")
     implementation("org.springframework.boot:spring-boot-starter-data-cassandra")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-authorization-server")
     implementation("org.springframework.boot:spring-boot-starter-security")
