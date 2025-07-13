@@ -1,0 +1,16 @@
+services:
+  cassandra:
+    image: cassandra:5
+    container_name: cassandra
+    ports:
+      - "9042:9042"
+    environment:
+      CASSANDRA_KEYSPACE: auth_keyspace
+
+  auth-server:
+    build: .
+    container_name: auth-server
+    depends_on:
+      - cassandra
+    environment:
+      SPRING_PROFILES_ACTIVE: default

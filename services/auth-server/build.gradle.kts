@@ -25,13 +25,17 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-authorization-server")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-web")
+
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("com.auth0:java-jwt:4.4.0")
+
     implementation("org.apache.kafka:kafka-streams")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-stream")
     implementation("org.springframework.cloud:spring-cloud-stream-binder-kafka-streams")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.cloud:spring-cloud-stream-test-binder")
