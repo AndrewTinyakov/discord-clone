@@ -5,9 +5,9 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.discord.authserver.dto.LoginDTO
 import com.discord.authserver.dto.RegisterDTO
 import com.discord.authserver.entity.User
+import com.discord.authserver.exception.InvalidCredentialsException
 import com.discord.authserver.exception.UsernameAlreadyExistsException
 import com.discord.authserver.repository.UserRepository
-import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -46,7 +46,7 @@ class AuthService(
             ?: throw UsernameNotFoundException("User='${request.username}' not found")
 
         if (!passwordEncoder.matches(request.password, user.hashedPassword)) {
-            throw BadCredentialsException("Bad credentials")
+            throw InvalidCredentialsException("Invalid password")
         }
 
         val token = JWT.create()

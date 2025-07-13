@@ -2,4 +2,4 @@ package com.discord.authserver.exception
 
 import java.lang.RuntimeException
 
-class UsernameAlreadyExistsException(message: String) : RuntimeException(message)
+class UsernameAlreadyExistsException(override val message: String) : RuntimeException(message)
