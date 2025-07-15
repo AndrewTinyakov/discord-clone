@@ -3,16 +3,12 @@ package com.discord.userservice.entity
 import org.springframework.data.cassandra.core.mapping.Column
 import org.springframework.data.cassandra.core.mapping.PrimaryKey
 import org.springframework.data.cassandra.core.mapping.Table
-import java.time.Instant
 import java.util.UUID
 
-@Table("users")
-data class User(
+@Table("user_username_to_id")
+data class UsernameLookup(
     @PrimaryKey
-    @Column("id")
-    val id: UUID = UUID.randomUUID(),
-    @Column("username")
     val username: String,
-    @Column("registration_time")
-    val registrationTime: Instant
+    @Column("user_id")
+    val id: UUID
 )

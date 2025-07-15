@@ -18,7 +18,7 @@ class UserController(
     @GetMapping("/current-user")
     fun getCurrentUser(): CurrentUserResponse {
         val userId = Auth.userId()
-        val currentUser = userService.getUserById(userId)
+        val currentUser = userService.getById(userId)
         val roles = Auth.roles()
         val response = userConverter.convertToCurrentUser(
             currentUser,
@@ -29,7 +29,7 @@ class UserController(
 
     @GetMapping("/{username}")
     fun getByUsername(@PathVariable username: String): UserResponse {
-        val user = userService.getUserByUsername(username)
+        val user = userService.getByUsername(username)
         val result = userConverter.convertToUser(user)
 
         return result

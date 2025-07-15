@@ -1,6 +1,14 @@
-CREATE TABLE IF NOT EXISTS users (
-    id uuid PRIMARY KEY,
-    username text
+CREATE TABLE IF NOT EXISTS users
+(
+    id                UUID PRIMARY KEY,
+    username          VARCHAR,
+    registration_time TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS users_username_idx ON users (username);
+CREATE TABLE IF NOT EXISTS user_username_to_id
+(
+    username VARCHAR PRIMARY KEY,
+    id       UUID
+)
+
+

@@ -1,25 +1,54 @@
 package com.discord.userservice.service
 
 import com.discord.userservice.entity.User
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
+import com.discord.userservice.entity.UsernameLookup
+import com.discord.userservice.exception.NotFoundException
+import com.discord.userservice.repository.UserRepository
+import com.discord.userservice.repository.UsernameLookupRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
+import java.time.Instant
+import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 @Transactional(readOnly = true)
-class UserServiceImpl : UserService {
+class UserServiceImpl(
+    private val userRepository: UserRepository,
+    private val usernameLookupRepository: UsernameLookupRepository
+) : UserService {
 
-    override fun getUserById(userId: UUID): User {
-        TODO("Not yet implemented")
+    override fun getById(userId: UUID): User {
+        val user = userRepository.findById(userId)
+            .getOrNull()
+            ?: throw NotFoundException("User not found by userId: $userId")
+        return user
     }
 
-    override fun getUserByUsername(username: String): User {
-        TODO("Not yet implemented")
+    override fun getByUsername(username: String): User {
+        val findByUsername = usernameLookupRepository.findById(username)
+            .getOrNull()
+            ?: throw NotFoundException("User not found by username: $username")
+
+        val user = userRepository.findById(findByUsername.id)
+            .getOrNull()!!
+        return user
     }
 
-    override fun searchByUsername(username: String, pageable: Pageable): Page<User> {
-        TODO("Not yet implemented")
+    @Transactional
+    override suspend fun insert(id: UUID, username: String): Unit = coroutineScope {
+        val user = User(id, username, Instant.now())
+        val usernameLookup = UsernameLookup(username, id)
+
+        launch(Dispatchers.IO) {
+            userRepository.insert(user)
+        }
+        launch(Dispatchers.IO) {
+            usernameLookupRepository.insert(usernameLookup)
+        }
     }
+
 }
