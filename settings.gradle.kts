@@ -1,6 +1,10 @@
 rootProject.name = "discord-clone"
 include(
-    "core",
-    "services",
-    "common"
+    "core:config-server",
+    "core:gateway",
+    "core:service-registry",
+    "services:auth-server",
+    "services:user-service",
+    "common:auth",
+    "common:events"
 )
