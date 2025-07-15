@@ -6,7 +6,3 @@ spring:
       uri: http://localhost:8888
       name: auth-server
       profile: dev
-  eureka:
-    client:
-      service-url:
-        defaultZone: http://eureka-server:8761/eureka/

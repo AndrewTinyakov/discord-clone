@@ -50,7 +50,7 @@ class AuthService(
         }
 
         val token = JWT.create()
-            .withSubject(request.username)
+            .withSubject( request.username)
             .withArrayClaim("roles", user.roles.toTypedArray())
             .withExpiresAt(Date(System.currentTimeMillis() + EXPIRED_DATE))
             .sign(
