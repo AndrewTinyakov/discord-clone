@@ -1,8 +1,8 @@
 spring:
   application:
-    name: service-registry
+    name: auth-server
   cloud:
     config:
       uri: http://localhost:8888
-      name: service-registry
+      name: auth-server
       profile: dev
