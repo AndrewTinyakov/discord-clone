@@ -11,10 +11,10 @@ import org.springframework.web.server.ResponseStatusException
 class AuthenticationFilter(
     private val jwtUtil: JwtUtil,
     private val validator: RouteValidator
-) : AbstractGatewayFilterFactory<AuthenticationFilter.Config?>(Config::class.java) {
+) : AbstractGatewayFilterFactory<AuthenticationFilter.Config>(Config::class.java) {
 
 
-    override fun apply(config: Config?): GatewayFilter? {
+    override fun apply(config: Config): GatewayFilter? {
         return (GatewayFilter { exchange, chain ->
             val request = exchange.request
 

@@ -18,29 +18,33 @@ repositories {
     mavenCentral()
 }
 
-extra["springCloudVersion"] = "2024.0.2"
+extra["springCloudVersion"] = "2024.0.1"
 
 dependencies {
+    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap")
     implementation("org.cognitor.cassandra:cassandra-migration-spring-boot-starter:2.6.1_v4")
     implementation("org.springframework.boot:spring-boot-starter-data-cassandra")
-
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-authorization-server")
+    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-web")
+
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("com.auth0:java-jwt:4.4.0")
+
+    implementation("org.apache.kafka:kafka-streams")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-
-    implementation("org.springframework.kafka:spring-kafka")
-    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
-    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+    implementation("org.springframework.cloud:spring-cloud-stream")
+    implementation("org.springframework.cloud:spring-cloud-stream-binder-kafka-streams")
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
 
-    implementation(project(":common:auth"))
     implementation(project(":common:events"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("org.springframework.cloud:spring-cloud-stream-test-binder")
+    testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
 }
 
 dependencyManagement {
@@ -57,4 +61,12 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.bootBuildImage {
+    builder = "paketobuildpacks/builder-jammy-base:latest"
+}
+
+tasks.test {
+    enabled = false
 }

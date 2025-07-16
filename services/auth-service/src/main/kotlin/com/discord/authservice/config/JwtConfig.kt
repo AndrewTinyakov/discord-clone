@@ -1,16 +1,19 @@
-package com.discord.gateway.config
+package com.discord.authservice.config
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.Resource
 import java.security.KeyFactory
-import java.security.interfaces.RSAPublicKey
+import java.security.PrivateKey
+import java.security.PublicKey
 import java.security.spec.X509EncodedKeySpec
-import java.util.*
+import java.util.Base64
 
 @Configuration
 class JwtConfig {
+    @Value("\${jwt.private-key}")
+    lateinit var privateKeyPath: Resource
 
     @Value("\${jwt.public-key}")
     lateinit var publicKeyPath: Resource
@@ -19,7 +22,21 @@ class JwtConfig {
     fun keyFactory(): KeyFactory = KeyFactory.getInstance(KEY_FACTORY_ALGORITHM)
 
     @Bean
-    fun publicKey(keyFactory: KeyFactory): RSAPublicKey {
+    fun privateKey(keyFactory: KeyFactory): PrivateKey {
+        val pem = privateKeyPath.inputStream.bufferedReader().use { it.readText() }
+
+        val privateKeyPEM = pem
+            .replace("-----BEGIN PRIVATE KEY-----", "")
+            .replace("-----END PRIVATE KEY-----", "")
+            .replace("\\s".toRegex(), "")
+
+        val decoded = Base64.getDecoder().decode(privateKeyPEM)
+        val keySpec = X509EncodedKeySpec(decoded)
+        return keyFactory.generatePrivate(keySpec)
+    }
+
+    @Bean
+    fun publicKey(keyFactory: KeyFactory): PublicKey {
         val pem = publicKeyPath.inputStream.bufferedReader().use { it.readText() }
 
         val publicKeyPEM = pem
@@ -29,7 +46,7 @@ class JwtConfig {
 
         val decoded = Base64.getDecoder().decode(publicKeyPEM)
         val keySpec = X509EncodedKeySpec(decoded)
-        return keyFactory.generatePublic(keySpec) as RSAPublicKey
+        return keyFactory.generatePublic(keySpec)
     }
 
     private companion object {

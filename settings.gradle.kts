@@ -3,7 +3,7 @@ include(
     "core:config-server",
     "core:gateway",
     "core:service-registry",
-    "services:auth-server",
+    "services:auth-service",
     "services:user-service",
     "common:auth",
     "common:events"
