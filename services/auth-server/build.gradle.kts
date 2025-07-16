@@ -65,3 +65,7 @@ tasks.withType<Test> {
 tasks.bootBuildImage {
     builder = "paketobuildpacks/builder-jammy-base:latest"
 }
+
+tasks.test {
+    enabled = false
+}

@@ -8,6 +8,7 @@ import com.discord.authserver.entity.User
 import com.discord.authserver.exception.InvalidCredentialsException
 import com.discord.authserver.exception.UsernameAlreadyExistsException
 import com.discord.authserver.repository.UserRepository
+import com.discord.authserver.repository.UsernameLookupRepository
 import com.discord.events.core.KafkaEventPublisher
 import com.discord.events.user.UserRegisteredEvent
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -25,17 +26,17 @@ import java.util.*
 @Transactional(readOnly = true)
 class AuthServiceImpl(
     private val userRepository: UserRepository,
+    private val usernameLookupRepository: UsernameLookupRepository,
     private val passwordEncoder: PasswordEncoder,
     private val privateKey: PrivateKey,
     private val publicKey: PublicKey,
     private val kafkaEventPublisher: KafkaEventPublisher
 ) : AuthService {
     override fun register(request: RegisterDTO) {
-        val existing = userRepository.findByUsername(request.username)
-
-        if (existing != null) {
-            throw UsernameAlreadyExistsException("User='${request.username}' already exists")
-        }
+        usernameLookupRepository.findById(request.username)
+            .ifPresent {
+                throw UsernameAlreadyExistsException("User='${request.username}' already exists")
+            }
 
         val hash = passwordEncoder.encode(request.password)
         val user = User(
@@ -59,8 +60,12 @@ class AuthServiceImpl(
     }
 
     override fun login(request: LoginDTO): String {
-        val user = userRepository.findByUsername(request.username)
-            ?: throw UsernameNotFoundException("User='${request.username}' not found")
+        val userLookup = usernameLookupRepository.findById(request.username)
+            .orElseThrow {
+                throw UsernameNotFoundException("User='${request.username}' not found")
+            }
+
+        val user = userRepository.findById(userLookup.id).get()
 
         if (!passwordEncoder.matches(request.password, user.hashedPassword)) {
             throw InvalidCredentialsException("Invalid password")
