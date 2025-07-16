@@ -37,7 +37,6 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-stream-binder-kafka-streams")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
-    implementation(project(":common:auth"))
     implementation(project(":common:events"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
