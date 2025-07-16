@@ -40,6 +40,11 @@ class UserServiceImpl(
 
     @Transactional
     override suspend fun insert(id: UUID, username: String): Unit = coroutineScope {
+        val existingUser = userRepository.findById(id)
+            .getOrNull()
+        if (existingUser != null) {
+            return@coroutineScope
+        }
         val user = User(id, username, Instant.now())
         val usernameLookup = UsernameLookup(username, id)
 
