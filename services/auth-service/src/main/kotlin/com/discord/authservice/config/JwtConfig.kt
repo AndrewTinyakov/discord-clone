@@ -7,6 +7,7 @@ import org.springframework.core.io.Resource
 import java.security.KeyFactory
 import java.security.PrivateKey
 import java.security.PublicKey
+import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import java.util.Base64
 
@@ -31,7 +32,7 @@ class JwtConfig {
             .replace("\\s".toRegex(), "")
 
         val decoded = Base64.getDecoder().decode(privateKeyPEM)
-        val keySpec = X509EncodedKeySpec(decoded)
+        val keySpec = PKCS8EncodedKeySpec(decoded)
         return keyFactory.generatePrivate(keySpec)
     }
 

@@ -6,11 +6,19 @@ services:
       - "9042:9042"
     environment:
       CASSANDRA_KEYSPACE: auth_keyspace
+    healthcheck:
+      test: [ "CMD-SHELL", "cqlsh -u cassandra -p cassandra -e \"describe keyspaces\"" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   auth-server:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: auth-server
     depends_on:
-      - cassandra
+      cassandra:
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: default
