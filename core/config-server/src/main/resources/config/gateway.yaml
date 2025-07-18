@@ -6,9 +6,14 @@ spring:
     name: gateway
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
       routes:
         - id: auth-service
-          uri: lb://AUTH-SERVER
+          uri: lb://AUTH-SERVICE
           predicates:
             - Path=/api/auth/**
           filters:
@@ -28,3 +33,11 @@ eureka:
 
 jwt:
   public-key: classpath:keys/public.pem
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    export:
+      zipkin:
+        endpoint: http://localhost:9411/api/v2/spans

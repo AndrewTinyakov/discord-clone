@@ -13,7 +13,7 @@ class CassandraMigrationConfig {
     @Bean
     fun migrationConfig(): MigrationConfiguration =
         MigrationConfiguration().withKeyspaceName("user_keyspace")
-
+    
     @Bean
     fun migrationTask(
         session: CqlSession,

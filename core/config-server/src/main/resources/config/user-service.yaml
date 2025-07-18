@@ -3,3 +3,16 @@ eureka:
     service-url:
       defaultZone: http://eureka-server:8761/eureka/
 
+server:
+  port: 8082
+
+spring:
+  data:
+    cassandra:
+      contact-points: 127.0.0.1:9042,127.0.0.1:9043,127.0.0.1:9044
+      port: 9042
+      keyspace-name: user_keyspace
+      schema-action: none
+      local-datacenter: datacenter1
+      username: app_user
+      password: cassandra

@@ -12,13 +12,15 @@ services:
       timeout: 5s
       retries: 5
 
-  auth-server:
+  auth-service:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: auth-server
+    container_name: auth-service
     depends_on:
       cassandra:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: default
+
+name: auth-service-compose

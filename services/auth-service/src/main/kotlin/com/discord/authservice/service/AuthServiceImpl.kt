@@ -7,11 +7,11 @@ import com.discord.authservice.dto.RegisterDTO
 import com.discord.authservice.entity.User
 import com.discord.authservice.exception.InvalidCredentialsException
 import com.discord.authservice.exception.UsernameAlreadyExistsException
+import com.discord.authservice.exception.UsernameNotFoundException
 import com.discord.authservice.repository.UserRepository
 import com.discord.authservice.repository.UsernameLookupRepository
 import com.discord.events.core.KafkaEventPublisher
 import com.discord.events.user.UserRegisteredEvent
-import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

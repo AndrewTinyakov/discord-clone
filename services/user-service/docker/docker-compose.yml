@@ -1,0 +1,103 @@
+version: '3.8'
+
+secrets:
+  cassandra_password:
+    file: ./cassandra_password.txt
+
+networks:
+  cass-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+volumes:
+  cass1-data:
+  cass2-data:
+  cass3-data:
+
+services:
+
+  cassandra-base: &cassandra-base
+    image: cassandra:5.0.4
+    environment:
+      - CASSANDRA_CLUSTER_NAME=DiscordCloneCluster
+      - CASSANDRA_SEEDS=cassandra1,cassandra2,cassandra3
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_AUTHENTICATOR=PasswordAuthenticator
+      - CASSANDRA_AUTHORIZER=CassandraAuthorizer
+      - CASSANDRA_PASSWORD_FILE=/run/secrets/cassandra_password
+    secrets:
+      - cassandra_password
+    healthcheck:
+      test: [ "CMD", "cqlsh", "-u", "cassandra", "-p", "$(cat /run/secrets/cassandra_password)", "-e", "describe cluster" ]
+      interval: 15s
+      timeout: 10s
+      retries: 8
+    restart: unless-stopped
+    networks:
+      cass-net:
+
+  cassandra1:
+    <<: *cassandra-base
+    container_name: cassandra1
+    volumes:
+      - cass1-data:/var/lib/cassandra
+    environment:
+      - CASSANDRA_BROADCAST_ADDRESS=cassandra1
+      - CASSANDRA_BROADCAST_RPC_ADDRESS=cassandra1
+    ports:
+      - "9042:9042"
+    networks:
+      cass-net:
+        ipv4_address: 172.28.1.2
+
+  cassandra2:
+    <<: *cassandra-base
+    container_name: cassandra2
+    volumes:
+      - cass2-data:/var/lib/cassandra
+    environment:
+      - CASSANDRA_BROADCAST_ADDRESS=cassandra2
+      - CASSANDRA_BROADCAST_RPC_ADDRESS=cassandra2
+    ports:
+      - "9043:9042"
+    networks:
+      cass-net:
+        ipv4_address: 172.28.1.3
+
+  cassandra3:
+    <<: *cassandra-base
+    container_name: cassandra3
+    volumes:
+      - cass3-data:/var/lib/cassandra
+    environment:
+      - CASSANDRA_BROADCAST_ADDRESS=cassandra3
+      - CASSANDRA_BROADCAST_RPC_ADDRESS=cassandra3
+    ports:
+      - "9044:9042"
+    networks:
+      cass-net:
+        ipv4_address: 172.28.1.4
+
+  cassandra-init:
+    image: cassandra:5.0.4
+    depends_on:
+      cassandra1:
+        condition: service_healthy
+    entrypoint:
+      - sh
+      - -c
+      - |
+        echo "Waiting for Cassandra to be ready…"
+        until cqlsh cassandra1 -u cassandra -p cassandra -e "DESC KEYSPACES"; do
+          sleep 3
+        done
+        echo "Applying schema.cql…"
+        cqlsh cassandra1 -u cassandra -p cassandra -f /schema.cql
+        echo "Bootstrap complete. Sleeping indefinitely."
+        sleep infinity
+    volumes:
+      - ./schema.cql:/schema.cql:ro
+    networks:
+      cass-net:
