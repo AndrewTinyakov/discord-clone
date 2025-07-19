@@ -25,6 +25,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
 
     implementation("org.springframework.boot:spring-boot-starter-data-cassandra")
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-database-cassandra:11.10.3")
+    implementation("com.ing.data:cassandra-jdbc-wrapper:4.11.1")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("com.auth0:java-jwt:4.4.0")

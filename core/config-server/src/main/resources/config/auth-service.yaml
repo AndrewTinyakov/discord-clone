@@ -8,6 +8,13 @@ spring:
       local-datacenter: datacenter1
       keyspace-name: auth_keyspace
       schema-action: CREATE_IF_NOT_EXISTS
+  flyway:
+    url: jdbc:cassandra://localhost:9042?localdatacenter=datacenter1
+    driver-class-name: com.ing.data.cassandra.jdbc.CassandraDriver
+    default-schema: auth_keyspace
+    sql-migration-suffixes: .cql
+    create-schemas: true
+    baseline-on-migrate: true
 
 jwt:
   private-key: classpath:keys/private.pem
