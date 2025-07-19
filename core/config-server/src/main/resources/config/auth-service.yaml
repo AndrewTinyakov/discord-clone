@@ -12,9 +12,11 @@ spring:
     url: jdbc:cassandra://localhost:9042?localdatacenter=datacenter1
     driver-class-name: com.ing.data.cassandra.jdbc.CassandraDriver
     default-schema: auth_keyspace
+    locations: classpath:db/migration
     sql-migration-suffixes: .cql
     create-schemas: true
-    baseline-on-migrate: true
+    baseline-on-migrate: false
+    baseline-version: 1
 
 jwt:
   private-key: classpath:keys/private.pem
