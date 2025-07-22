@@ -1,17 +1,17 @@
 package com.discord.authservice.config
 
 import org.flywaydb.core.Flyway
-import org.springframework.boot.autoconfigure.cassandra.CqlSessionBuilderCustomizer
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.autoconfigure.flyway.FlywayProperties
+import org.springframework.boot.autoconfigure.cassandra.CqlSessionBuilderCustomizer
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import java.util.*
-
+import org.springframework.jdbc.datasource.DriverManagerDataSource
+import javax.sql.DataSource
 
 @Configuration
 class CassandraConfig {
-
     @Bean
     fun localDcCustomizer(): CqlSessionBuilderCustomizer =
         CqlSessionBuilderCustomizer { builder ->
@@ -20,25 +20,32 @@ class CassandraConfig {
         }
 
     @Bean
-    @ConditionalOnProperty(prefix = "flyway", name = ["enabled"], havingValue = "true", matchIfMissing = true)
-    fun flyway(): Flyway? {
-        val flyway =  Flyway.configure()
-            .dataSource("jdbc:cassandra://localhost:9042?localdatacenter=datacenter1", null, null)
-            .defaultSchema("auth_keyspace")
-            .sqlMigrationSuffixes(".cql")
-            .createSchemas(true)
-            .baselineOnMigrate(true)
-            .locations("classpath:db/migration")
-            .load()
-        flyway.migrate()
+    @ConfigurationProperties(prefix = "spring.flyway")
+    fun flywayProperties(): FlywayProperties = FlywayProperties()
 
-        return flyway
+    @Bean
+    fun cassandraDataSource(flywayProperties: FlywayProperties): DataSource {
+        val dataSource = DriverManagerDataSource()
+
+        dataSource.setDriverClassName("com.ing.data.cassandra.jdbc.CassandraDriver")
+        dataSource.url = flywayProperties.url
+
+        return dataSource
     }
 
     @Bean
-    @ConfigurationProperties("spring.cassandra.jdbc")
-    fun cassandraJdbcProperties(): Properties? {
-        return Properties()
-    }
+    @ConditionalOnProperty(prefix = "spring.flyway", name = ["enabled"], havingValue = "true", matchIfMissing = true)
+    fun flyway(
+        dataSource: DataSource,
+        flywayProperties: FlywayProperties
+    ): Flyway {
+        val config = Flyway.configure()
+            .dataSource(dataSource)
+            .defaultSchema(flywayProperties.defaultSchema)
+            .sqlMigrationSuffixes(*flywayProperties.sqlMigrationSuffixes.toTypedArray())
+            .baselineOnMigrate(flywayProperties.isBaselineOnMigrate)
+            .locations(*flywayProperties.locations.toTypedArray())
 
+        return config.load().also { it.migrate() }
+    }
 }
