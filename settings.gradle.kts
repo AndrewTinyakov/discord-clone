@@ -8,6 +8,7 @@ include(
     "services:chat-service",
     "services:message-service",
     "services:aggregators:messenger-aggregator",
+    "services:ws-service",
     "common:auth",
     "common:events",
     "common:pagination",
