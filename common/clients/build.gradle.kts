@@ -21,27 +21,15 @@ repositories {
 extra["springCloudVersion"] = "2024.0.2"
 
 dependencies {
-    implementation("org.cognitor.cassandra:cassandra-migration-spring-boot-starter:2.6.1_v4")
-    implementation("org.springframework.boot:spring-boot-starter-data-cassandra")
-
-    implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-
-    implementation("org.springframework.kafka:spring-kafka")
-    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap")
-    implementation("org.springframework.cloud:spring-cloud-starter-config")
-    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
-
-    implementation(project(":common:auth"))
-    implementation(project(":common:events"))
+    api("org.springframework.cloud:spring-cloud-starter-openfeign")
+    implementation(project(":common:pagination"))
     implementation(project(":common:dto"))
 
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
 }
 
 dependencyManagement {

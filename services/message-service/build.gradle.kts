@@ -6,6 +6,7 @@ plugins {
 }
 
 group = "com.discord"
+description = "message-service"
 version = "0.0.1-SNAPSHOT"
 
 java {
@@ -21,34 +22,44 @@ repositories {
 extra["springCloudVersion"] = "2024.0.2"
 
 dependencies {
-    implementation("org.cognitor.cassandra:cassandra-migration-spring-boot-starter:2.6.1_v4")
-    implementation("org.springframework.boot:spring-boot-starter-data-cassandra")
-
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap")
+
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
-    implementation("org.springframework.kafka:spring-kafka")
-    implementation("org.springframework.cloud:spring-cloud-starter-bootstrap")
+    implementation("org.springframework.boot:spring-boot-starter-data-cassandra")
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-database-cassandra:11.10.3")
+    implementation("com.ing.data:cassandra-jdbc-wrapper:4.11.1")
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+
     implementation("org.springframework.cloud:spring-cloud-starter-config")
+    implementation("org.apache.kafka:kafka-streams")
+    implementation("org.springframework.cloud:spring-cloud-stream")
+    implementation("org.springframework.cloud:spring-cloud-stream-binder-kafka-streams")
+
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
 
-    implementation(project(":common:auth"))
+    implementation("io.micrometer:micrometer-tracing-bridge-brave")
+    implementation("io.zipkin.reporter2:zipkin-reporter-brave")
     implementation(project(":common:events"))
     implementation(project(":common:dto"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
 }
+
 
 dependencyManagement {
     imports {
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
     }
 }
+
 
 kotlin {
     compilerOptions {

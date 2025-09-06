@@ -1,9 +1,9 @@
 package com.discord.userservice.controller
 
 import com.discord.auth.Auth
+import com.discord.dto.user.CurrentUserResponse
+import com.discord.dto.user.UserResponse
 import com.discord.userservice.converter.UserConverter
-import com.discord.userservice.payload.response.CurrentUserResponse
-import com.discord.userservice.payload.response.UserResponse
 import com.discord.userservice.service.UserService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable

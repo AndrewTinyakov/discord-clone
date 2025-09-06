@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: chat-service
+  data:
+    cassandra:
+      contact-points: 127.0.0.1
+      port: 9044
+      local-datacenter: datacenter1
+      keyspace-name: chat_keyspace
+      schema-action: CREATE_IF_NOT_EXISTS
+  flyway:
+    url: jdbc:cassandra://localhost:9044?localdatacenter=datacenter1
+    driver-class-name: com.ing.data.cassandra.jdbc.CassandraDriver
+    default-schema: chat_keyspace
+    locations: classpath:db/migration
+    sql-migration-suffixes: .cql
+    create-schemas: true
+    baseline-on-migrate: false
+    baseline-version: 1
+
+eureka:
+  client:
+    service-url:
+      defaultZone : http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+
+server:
+  port: 8083
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    export:
+      zipkin:
+        endpoint: http://localhost:9411/api/v2/spans
+
+logging:
+  level:
+    com.datastax.oss.driver: INFO
+    org.cognitor.cassandra: DEBUG
+    org.springframework.data.cassandra: DEBUG
