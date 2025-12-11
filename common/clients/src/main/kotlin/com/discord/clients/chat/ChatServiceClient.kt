@@ -7,18 +7,18 @@ import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
-import java.util.UUID
+import java.util.*
 
 @FeignClient(name = "chat-service")
 interface ChatServiceClient {
 
-    @GetMapping("/api/chats")
+    @GetMapping("/api/internal/chats")
     fun getChats(
         @RequestParam(required = false) cursorId: Long?,
         @RequestParam(defaultValue = "20") limit: Int
     ): CursorPageResponse<ChatPreviewResponse>
 
-    @GetMapping("/api/chats/{id}")
+    @GetMapping("/api/internal/chats/{id}")
     fun getChatById(
         @PathVariable id: String,
         userId: UUID

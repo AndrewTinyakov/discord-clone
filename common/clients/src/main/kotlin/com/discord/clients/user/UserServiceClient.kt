@@ -4,12 +4,12 @@ import com.discord.dto.user.UserResponse
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
-import java.util.UUID
+import java.util.*
 
 @FeignClient(name = "user-service")
 interface UserServiceClient {
 
-    @GetMapping("/api/users")
+    @GetMapping("/api/internal/users")
     fun getByIds(@RequestParam ids: Set<UUID>): List<UserResponse>
 
 }

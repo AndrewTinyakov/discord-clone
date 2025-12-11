@@ -47,6 +47,7 @@ dependencies {
     implementation("io.zipkin.reporter2:zipkin-reporter-brave")
     implementation(project(":common:events"))
     implementation(project(":common:dto"))
+    implementation(project(":common:clients"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

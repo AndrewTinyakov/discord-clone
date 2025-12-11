@@ -2,16 +2,21 @@ rootProject.name = "discord-clone"
 include(
     "core:config-server",
     "core:gateway",
-    "core:service-registry",
+    "core:service-registry"
+)
+include(
     "services:auth-service",
     "services:user-service",
     "services:chat-service",
     "services:message-service",
     "services:aggregators:messenger-aggregator",
     "services:ws-service",
+    "services:ws-channel-service",
+)
+include(
     "common:auth",
     "common:events",
     "common:pagination",
-    "common:clients"
+    "common:clients",
+    "common:dto"
 )
-include("common:dto")
